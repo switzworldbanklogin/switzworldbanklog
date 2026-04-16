@@ -1,1 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Switzerland World Bank Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<style>
+body{
+    margin:0;
+    font-family: Arial;
+    background:#f4f6f9;
+}
+
+/* LOGIN */
+.login{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    background:#0b3a63;
+}
+.login-box{
+    background:#fff;
+    padding:30px;
+    border-radius:10px;
+    width:300px;
+}
+input, select{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+button{
+    width:100%;
+    padding:10px;
+    background:#0b3a63;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
+
+/* DASHBOARD */
+.dashboard{
+    display:none;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:220px;
+    background:#0b3a63;
+    color:#fff;
+    height:100vh;
+    position:fixed;
+}
+.logo{
+    padding:20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:bold;
+}
+.sidebar li{
+    padding:15px;
+    list-style:none;
+    cursor:pointer;
+}
+.sidebar li:hover,
+.active{
+    background:#124b7c;
+}
+
+/* LOGOUT BUTTON */
+.logout-btn{
+    color:#ff4d4d;
+}
+.logout-btn:hover{
+    background:#8b0000;
+    color:#fff;
+}
+
+/* MAIN */
+.main{
+    margin-left:220px;
+    padding:20px;
+}
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* CARDS */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-top:20px;
+}
+.card{
+    background:#fff;
+    padding:15px;
+    border-radius:8px;
+}
+.card h4{
+    margin:0;
+    color:#666;
+}
+.card p{
+    font-size:22px;
+    color:#0b3a63;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:2fr 2fr;
+    gap:15px;
+    margin-top:20px;
+}
+.box{
+    background:#fff;
+    padding:20px;
+    border-radius:8px;
+}
+
+/* TABLE */
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+th, td{
+    padding:8px;
+    border-bottom:1px solid #ddd;
+}
+
+/* SECTIONS */
+.section{
+    display:none;
+}
+.active-section{
+    display:block;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="login" id="loginPage">
+    <div class="login-box">
+        <h2>Switzerland World Bank</h2>
+        <input id="user" placeholder="Username">
+        <input id="pass" type="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+
+<div class="sidebar">
+    <div class="logo">🌐 Switzerland World Bank</div>
+
+    <li onclick="showSection('dashboardSection', this)" class="active">Dashboard</li>
+    <li onclick="showSection('analyticsSection', this)">Analytics</li>
+    <li onclick="showSection('dataSection', this)">Data Entry</li>
+    <li onclick="showSection('settingsSection', this)">Settings</li>
+
+    <!-- LOGOUT -->
+    <li onclick="logout()" class="logout-btn">Logout</li>
+</div>
+
+<div class="main">
+
+<div class="topbar">
+    <h2>Hello Forest Wagner!</h2>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardSection" class="section active-section">
+    <div class="cards">
+        <div class="card"><h4>IBRD Portfolio</h4><p>$6,200,000.00</p></div>
+        <div class="card"><h4>IDA Commitments</h4><p>$6,200,000.00</p></div>
+        <div class="card"><h4>Disbursements</h4><p>$6,200,000.00</p></div>
+        <div class="card"><h4>Investments</h4><p>$6,200,000.00</p></div>
+    </div>
+
+    <div class="grid">
+        <div class="box">
+            <h4>Portfolio Allocation</h4>
+            <canvas id="pieChart"></canvas>
+        </div>
+        <div class="box">
+            <h4>Disbursement Trend</h4>
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ANALYTICS -->
+<div id="analyticsSection" class="section">
+    <div class="box">
+        <h3>Analytics Overview</h3>
+        <p>Advanced analytics data coming here...</p>
+    </div>
+</div>
+
+<!-- DATA ENTRY -->
+<div id="dataSection" class="section">
+    <div class="box">
+        <h3>Data Entry</h3>
+        <input placeholder="Enter Project Name">
+        <input placeholder="Enter Amount">
+        <select>
+            <option>Select Region</option>
+            <option>America</option>
+            <option>Europe/Asia</option>
+        </select>
+        <button>Submit</button>
+    </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settingsSection" class="section">
+    <div class="box">
+        <h3>Settings</h3>
+        <p>Manage system settings here</p>
+    </div>
+</div>
+
+</div>
+</div>
+
+<script>
+function login(){
+    if(user.value==="admin" && pass.value==="1234"){
+        loginPage.style.display="none";
+        dashboard.style.display="block";
+        loadCharts();
+    }else{
+        alert("Wrong login");
+    }
+}
+
+function logout(){
+    dashboard.style.display="none";
+    loginPage.style.display="flex";
+    user.value = "";
+    pass.value = "";
+}
+
+/* SWITCH SECTIONS */
+function showSection(id, el){
+    document.querySelectorAll('.section').forEach(sec=>{
+        sec.classList.remove('active-section');
+    });
+
+    document.getElementById(id).classList.add('active-section');
+
+    document.querySelectorAll('.sidebar li').forEach(li=>{
+        li.classList.remove('active');
+    });
+
+    el.classList.add('active');
+}
+
+/* CHARTS */
+function loadCharts(){
+    new Chart(document.getElementById("pieChart"),{
+        type:"doughnut",
+        data:{
+            labels:["Loans","Credits","Bonds","Investments"],
+            datasets:[{
+                data:[210,160,75,96]
+            }]
+        }
+    });
+
+    new Chart(document.getElementById("barChart"),{
+        type:"bar",
+        data:{
+            labels:["FY20","FY21","FY22","FY23","FY24"],
+            datasets:[{
+                label:"Disbursements",
+                data:[17,19,21,24,26]
+            }]
+        }
+    });
+}
+</script>
+
+</body>
+</html>
